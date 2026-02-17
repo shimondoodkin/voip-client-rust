@@ -639,27 +639,27 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Idle: new()
+    [*] --> Idle : new()
 
-    Idle --> Registering: Call / run()
-    Registering --> Registered: 200 OK
-    Registering --> Idle: Registration Failed
+    Idle --> Registering : Call / run()
+    Registering --> Registered : 200 OK
+    Registering --> Idle : Registration Failed
 
-    Registered --> Calling: VoipCommand::Call
-    Registered --> Ringing: Incoming INVITE
-    Registered --> Idle: Quit
+    Registered --> Calling : Call command
+    Registered --> Ringing : Incoming INVITE
+    Registered --> Idle : Quit
 
-    Calling --> InCall: 200 OK + ACK
-    Calling --> Registered: CANCEL / Reject
+    Calling --> InCall : 200 OK + ACK
+    Calling --> Registered : CANCEL / Reject
 
-    Ringing --> InCall: VoipCommand::Answer
-    Ringing --> Registered: VoipCommand::Hangup
+    Ringing --> InCall : Answer command
+    Ringing --> Registered : Hangup command
 
-    InCall --> Held: VoipCommand::Hold
-    InCall --> Registered: BYE (local or remote)
+    InCall --> Held : Hold command
+    InCall --> Registered : BYE
 
-    Held --> InCall: VoipCommand::Unhold
-    Held --> Registered: BYE (local or remote)
+    Held --> InCall : Unhold command
+    Held --> Registered : BYE
 ```
 
 ### Hold / Transfer Flow
