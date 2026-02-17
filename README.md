@@ -372,21 +372,21 @@ Consumer code                        dns.rs                          DNS Server
      │                                  │                                │
      │  resolve_sip_server("voip.com")  │                                │
      │ ──────────────────────────────►  │                                │
-     │                                  │  _sips._tcp.voip.com SRV?     │
+     │                                  │  _sips._tcp.voip.com SRV?      │
      │                                  │ ─────────────────────────────► │
      │                                  │  ◄───── (no records)           │
      │                                  │                                │
-     │                                  │  _sip._udp.voip.com SRV?      │
+     │                                  │  _sip._udp.voip.com SRV?       │
      │                                  │ ─────────────────────────────► │
-     │                                  │  ◄───── sip1.voip.com:5060    │
-     │                                  │         pri=10 weight=100     │
+     │                                  │  ◄───── sip1.voip.com:5060     │
+     │                                  │         pri=10 weight=100      │
      │                                  │                                │
-     │                                  │  sip1.voip.com A?             │
+     │                                  │  sip1.voip.com A?              │
      │                                  │ ─────────────────────────────► │
-     │                                  │  ◄───── 203.0.113.10          │
+     │                                  │  ◄───── 203.0.113.10           │
      │                                  │                                │
-     │  ◄─── SipDnsResult {            │                                │
-     │         addr: 203.0.113.10:5060 │                                │
+     │  ◄─── SipDnsResult {             │                                │
+     │         addr: 203.0.113.10:5060  │                                │
      │         transport: Udp           │                                │
      │       }                          │                                │
      │                                  │                                │
@@ -438,7 +438,7 @@ The library is organized in horizontal layers, with three vertical pillars in th
 │                            CONSUMER APPLICATION                                 │
 │                                                                                 │
 │  examples/cli.rs          Android App           AI Pipeline          Any App    │
-│  (cpal audio I/O)         (Oboe/AAudio)         (ai_avatar2)        (embedded) │
+│  (cpal audio I/O)         (Oboe/AAudio)         (ai_avatar2)        (embedded)  │
 └────────────────────────────────┬────────────────────────────────────────────────┘
                                  │  VoipCommand ↓    VoipEvent ↑
                                  │  audio_tx ↓       audio_rx ↑
@@ -450,18 +450,18 @@ The library is organized in horizontal layers, with three vertical pillars in th
 └──────┬──────────────────────────────────┬───────────────────────────┬───────────┘
        │                                  │                           │
 ┌──────┴──────────────┐  ┌────────────────┴────────────────┐  ┌──────┴──────────┐
-│ SIP PROTOCOL STACK  │  │        MEDIA STACK               │  │  NAT / NETWORK  │
-│     (signaling)     │  │         (audio)                  │  │   (discovery)   │
-│                     │  │                                  │  │                 │
+│ SIP PROTOCOL STACK  │  │        MEDIA STACK              │  │  NAT / NETWORK  │
+│     (signaling)     │  │         (audio)                 │  │   (discovery)   │
+│                     │  │                                 │  │                 │
 │ ┌─────────────────┐ │  │ ┌──────────┐ ┌───────────────┐  │  │ ┌─────────────┐ │
-│ │    sip.rs        │ │  │ │ codec.rs │ │   rtp.rs      │  │  │ │   nat.rs    │ │
+│ │    sip.rs       │ │  │ │ codec.rs │ │   rtp.rs      │  │  │ │   nat.rs    │ │
 │ │                 │ │  │ │          │ │               │  │  │ │             │ │
 │ │ REGISTER        │ │  │ │ Opus     │ │ RTP pkt build │  │  │ │ UPnP-IGD    │ │
 │ │ INVITE / ACK    │ │  │ │ G.722    │ │ RTP pkt parse │  │  │ │ STUN        │ │
-│ │ BYE / CANCEL    │ │  │ │ G.711 μ  │ │ DTMF tx/rx   │  │  │ │ fallback    │ │
+│ │ BYE / CANCEL    │ │  │ │ G.711 μ  │ │ DTMF tx/rx    │  │  │ │ fallback    │ │
 │ │ PRACK (100rel)  │ │  │ │ G.711 A  │ │ 16k↔8k resamp │  │  │ └──────┬──────┘ │
 │ │ REFER / NOTIFY  │ │  │ └──────────┘ └───────────────┘  │  │        │        │
-│ │ re-INVITE       │ │  │                                  │  │ ┌──────┴──────┐ │
+│ │ re-INVITE       │ │  │                                 │  │ ┌──────┴──────┐ │
 │ │ Session timers  │ │  │ ┌──────────┐ ┌───────────────┐  │  │ │  stun.rs    │ │
 │ │ Digest auth     │ │  │ │ srtp.rs  │ │  jitter.rs    │  │  │ │             │ │
 │ │ Hold / Unhold   │ │  │ │          │ │               │  │  │ │ STUN bind   │ │
@@ -469,7 +469,7 @@ The library is organized in horizontal layers, with three vertical pillars in th
 │ │                 │ │  │ │ HMAC-SHA1│ │ Reorder       │  │  │ │ RFC 5389    │ │
 │ │ ┌─────────────┐ │ │  │ │ RFC 3711 │ │ Jitter est.   │  │  │ └─────────────┘ │
 │ │ │  sdp.rs     │ │ │  │ └──────────┘ └───────────────┘  │  │                 │
-│ │ │             │ │ │  │                                  │  │ ┌─────────────┐ │
+│ │ │             │ │ │  │                                 │  │ ┌─────────────┐ │
 │ │ │ SDP offer   │ │ │  │ ┌────────────────────────────┐  │  │ │   dns.rs    │ │
 │ │ │ SDP answer  │ │ │  │ │     resample.rs            │  │  │ │             │ │
 │ │ │ Codec nego  │ │ │  │ │                            │  │  │ │ SRV lookup  │ │
@@ -489,9 +489,9 @@ The library is organized in horizontal layers, with three vertical pillars in th
 ┌────────────────────────────────────────┴────────────────────────────────────────┐
 │                         TLS / CRYPTO LAYER                                      │
 │                                                                                 │
-│  tokio-rustls / rustls          md-5 / hex               aes / ctr / hmac      │
-│  webpki-roots                   (digest auth)            sha1 / base64         │
-│  (SIP over TLS)                                          (SRTP crypto)         │
+│  tokio-rustls / rustls          md-5 / hex               aes / ctr / hmac       │
+│  webpki-roots                   (digest auth)            sha1 / base64          │
+│  (SIP over TLS)                                          (SRTP crypto)          │
 └────────────────────────────────────────┬────────────────────────────────────────┘
                                          │
 ┌────────────────────────────────────────┴────────────────────────────────────────┐
